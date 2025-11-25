@@ -239,15 +239,17 @@
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js").then(reg => {
-    reg.onupdatefound = () => {
+    reg.addEventListener("updatefound", () => {
       const newWorker = reg.installing;
-      newWorker.onstatechange = () => {
-        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-          // Automatically reload when an update is installed
-          window.location.reload();
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed") {
+          if (navigator.serviceWorker.controller) {
+            // New update found, reload the page
+            window.location.reload();
+          }
         }
-      };
-    };
+      });
+    });
   });
 }
   
