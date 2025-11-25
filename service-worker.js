@@ -1,4 +1,4 @@
-const CACHE_NAME = "studio-cache-v1";
+const CACHE_NAME = "studio-cache-v1"; // can stay same
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,7 +8,6 @@ const ASSETS = [
   "./icon-512.png"
 ];
 
-// Install — cache essential files immediately
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -16,30 +15,17 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activate — remove old caches and take control instantly
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-
   self.clients.claim();
 });
 
-// Fetch — network first, fallback to cache
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Update cache with fresh version
-        const clone = response.clone();
+        // Update cache if file changed
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, clone);
+          cache.put(event.request, response.clone());
         });
         return response;
       })
