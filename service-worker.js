@@ -1,10 +1,10 @@
 const CACHE_NAME = 'mystudio-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './style.css',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install SW and cache files
