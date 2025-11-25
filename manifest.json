@@ -1,7 +1,7 @@
 {
   "name": "MyStudio",
   "short_name": "Studio",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#009688", 
