@@ -1,34 +1,16 @@
-const CACHE_NAME = 'mystudio-cache-v1';
-const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './Icon-192.png',
-  './icon-512.png'
-];
-
-// Install SW and cache files
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+self.addEventListener("install", (event) => {
+  // Activate immediately
+  self.skipWaiting();
 });
 
-// Activate SW
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => Promise.all(
-      cacheNames.map(cacheName => {
-        if (cacheName !== CACHE_NAME) return caches.delete(cacheName);
-      })
-    ))
-  );
+self.addEventListener("activate", (event) => {
+  // Claim clients so the SW starts controlling pages ASAP
+  event.waitUntil(self.clients.claim());
 });
 
-// Fetch resources
-self.addEventListener('fetch', event => {
+// Simple fetch handler that always tries network first
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
