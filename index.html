@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Chess Studio</title>
+<script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+ <link rel="stylesheet" href="style.css">
+ 
+ <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#009688">
+</head>
+
+<style>
+
+</style>
+<body>
+      <h1 class="name">Welcome to your chess studio</h1>
+
+  <nav>
+    <div class="name">
+      <button onclick="showPage('home')">Home</button>
+      
+    </div>
+    
+    <div class="name">
+       <button onclick="showPage('tournaments')">Tournaments</button>
+       </div>
+    
+    <div class="name">
+      <button onclick="showPage('players')">Players</button>
+    </div>
+    
+    <div class="name">
+    <button onclick="showPage('articles')">Articles / Scorecards</button>
+    </div>
+    
+  </nav>
+
+  <!-- HOME -->
+  <div id="home" class="page show">
+
+    <div id="calendar-container"></div>
+
+<br><br>
+
+<!-- Blog Button -->
+<div class="name">
+  <div class="hook">
+    <a id="blogLink" href="#" target="_blank">View blog</a>
+  </div>
+</div>
+<br>
+
+<!-- Chess Profile Button -->
+<div class="name">
+  <div class="hook">
+    <a id="profileLink" href="#" target="_blank">Chess profile</a>
+  </div>
+</div>
+<br>
+<!-- Chess Profile Button -->
+<div class="name">
+  <div class="hook">
+    <a id="profileLink" href="https://whatsapp.com/channel/0029VbBxUG19sBI3yNE3WH2I" target="_blank">View channel</a>
+  </div>
+</div>
+
+
+
+<br><br><br>
+
+<!-- Toggle Edit Button -->
+<button id="editUrlsBtn">Edit links</button>
+
+<!-- Editable Fields (hidden by default) -->
+<div id="urlEditor" style="display:none; margin-top:20px;">
+  
+  <label>Blog URL:</label><br>
+  <input type="text" id="blogUrlInput" style="width:90%;"><br><br>
+
+  <label>Chess Profile URL:</label><br>
+  <input type="text" id="profileUrlInput" style="width:90%;"><br><br>
+
+  <button id="saveUrlsBtn">Save links</button>
+</div>
+  </div>
+  
+ 
+
+  <!-- TOURNAMENTS -->
+  <div id="tournaments" class="page">
+    <h1 class="">Create Tournament</h1>
+
+    <div class="field-row">
+      <input id="t_name" placeholder="Tournament Name" />
+    </div>
+    <div class="field-row">
+      <input id="t_date" type="date" />
+    </div>
+    <div class="field-row">
+      <textarea id="t_desc" placeholder="Description"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="flex-row">
+        <button onclick="addTournament()">Add Tournament</button>
+        <button onclick="clearTournamentForm()">Clear</button>
+      </div>
+    </div>
+ <br>
+    <h2 class="">Scheduled Tournaments</h2>
+    <div id="tournamentList"></div>
+  </div>
+
+  <!-- TOURNAMENT VIEW / EDIT -->
+  <div id="tournamentView" class="page">
+    <h2 id="tv_name"></h2>
+    <p><b>Date:</b> <span id="tv_date"></span></p>
+    <p id="tv_desc"></p>
+
+    <div style="margin-top:12px;" class="flex-row">
+      <button onclick="showEditTournament()">Edit</button>
+      <button onclick="deleteTournamentViewed()" class="danger">Delete</button>
+      <button onclick="showPage('tournaments')">Back</button>
+    </div>
+  </div>
+
+  <div id="tournamentEdit" class="page">
+    <br>
+    <h2 class="">Edit Tournament</h2>
+    <input id="et_name" placeholder="Tournament Name" /><br>
+    <input id="et_date" type="date" /><br>
+    <textarea id="et_desc" placeholder="Description"></textarea><br>
+    <div class="flex-row">
+      <button onclick="saveTournamentEdits()">Save Changes</button>
+      <button onclick="cancelEditTournament()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- PLAYERS -->
+  <div id="players" class="page">
+    <br>
+    <h2 class="">Create Player</h2>
+    <br>
+
+    <div class="field-row">
+      <input id="p_name" placeholder="Player Name" />
+    </div>
+    <div class="field-row">
+      <textarea id="p_desc" placeholder="Description"></textarea>
+    </div>
+    <div class="field-row">
+      <input id="p_url" placeholder="Player URL (external profile)" />
+    </div>
+
+    <div class="field-row">
+      <div class="flex-row">
+        <button onclick="addPlayer()">Add Player</button>
+        <br>
+        <button onclick="clearPlayerForm()">Clear</button>
+      </div>
+    </div>
+    <br>
+    <h2 class="">List of Players</h2>
+    <div id="playersList"></div>
+  </div>
+
+  <!-- PLAYER VIEW / EDIT -->
+  <div id="playerView" class="page">
+    <h2 id="pv_name"></h2>
+    <p id="pv_desc" class="big"></p>
+
+    <div style="margin-top:12px;" class="flex-row">
+      <button onclick="openPlayerUrl()">View External Profile</button>
+      <button onclick="showEditPlayer()">Edit</button>
+      <button onclick="deletePlayerViewed()" class="danger">Delete</button>
+      <button onclick="showPage('players')">Back</button>
+    </div>
+  </div>
+
+  <div id="playerEdit" class="page">
+    <h2>Edit Player</h2>
+    <input id="ep_name" placeholder="Player Name" /><br>
+    <textarea id="ep_desc" placeholder="Player Description"></textarea><br>
+    <input id="ep_url" placeholder="Player URL" /><br>
+
+    <div class="flex-row">
+      <button onclick="savePlayerEdits()">Save Changes</button>
+      <button onclick="cancelEditPlayer()">Cancel</button>
+    </div>
+  </div>
+  <!-- ARTICLES / SCORECARDS -->
+  <div id="articles" class="page">
+    <h2 class="">Tournament Scorecards</h2>
+    <div class="field"><input id="a_image" placeholder="Image URL (optional)" /></div>
+    <div class="field"><input id="a_title" placeholder="Title" /></div>
+    <div class="field"><textarea id="a_desc" placeholder="Description"></textarea></div>
+    <div class="flex-row"><button onclick="addArticle()">Create Article</button><button onclick="clearArticleForm()">Clear</button></div>
+    <br><br>
+    <h3>Articles</h3>
+    <div id="articleList"></div>
+  </div>
+
+  <!-- ARTICLE VIEW (scorecard) -->
+  <div id="articleView" class="page">
+    <div class="article-card">
+      <img id="av_image" class="article-image" alt="" style="display:none;" width="350" height="100" />
+      <h2 id="av_title"></h2>
+      <p id="av_desc" class="muted"></p>
+
+      <div style="margin-top:10px;" class="flex-row">
+        <button onclick="openAddPlayerModal()">Add Player to Scorecard</button>
+        <button onclick="exportScorecardCSV()">Export CSV</button>
+        <button onclick="showPage('articles')">Back</button>
+      </div>
+
+      <div class="scorecard" id="scorecardContainer">
+        <p class="small muted">Scorecard (1–10) — add players using the button above.</p>
+        <div id="scoreRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for picking players -->
+  <div id="playerModal" style="display:none;">
+    <div class="modal-backdrop" onclick="closePlayerModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3>Select a player</h3>
+        <div id="modalPlayers" class="players-list"></div>
+        <div style="margin-top:10px;" class="flex-row">
+          <button onclick="closePlayerModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(reg => console.log('Service Worker registered.', reg))
+    .catch(err => console.log('Service Worker registration failed: ', err));
+}
+  
+  // Load saved URLs
+window.addEventListener("load", () => {
+  const savedBlog = localStorage.getItem("blogUrl");
+  const savedProfile = localStorage.getItem("profileUrl");
+
+  if (savedBlog) document.getElementById("blogLink").href = savedBlog;
+  if (savedProfile) document.getElementById("profileLink").href = savedProfile;
+});
+
+// Toggle editor visibility
+document.getElementById("editUrlsBtn").addEventListener("click", () => {
+  const editor = document.getElementById("urlEditor");
+  editor.style.display = editor.style.display === "none" ? "block" : "none";
+});
+
+// Save URLs
+document.getElementById("saveUrlsBtn").addEventListener("click", () => {
+  const blogUrl = document.getElementById("blogUrlInput").value.trim();
+  const profileUrl = document.getElementById("profileUrlInput").value.trim();
+
+  if (blogUrl !== "") {
+    localStorage.setItem("blogUrl", blogUrl);
+    document.getElementById("blogLink").href = blogUrl;
+  }
+
+  if (profileUrl !== "") {
+    localStorage.setItem("profileUrl", profileUrl);
+    document.getElementById("profileLink").href = profileUrl;
+  }
+
+  alert("Links updated!");
+});
+
+
+/* ---------- Dexie DB ---------- */
+const db = new Dexie("ChessDB");
+db.version(1).stores({
+  tournaments: "++id,name,date,description",
+  players: "++id,playersName,playerDesc,playerURL",
+  articles: "++id,image,title,description,createdAt",
+  scorecards: "++id,articleId,playerId,score" // score is number 1-10
+});
+
+/* ---------- Page system ---------- */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('show');
+}
+
+/* -----------------------
+   Tournament functions
+   ----------------------- */
+async function addTournament() {
+  const name = document.getElementById('t_name').value.trim();
+  const date = document.getElementById('t_date').value;
+  const desc = document.getElementById('t_desc').value.trim();
+
+  if (!name || !date) {
+    alert("Please provide a name and date for the tournament.");
+    return;
+  }
+
+  await db.tournaments.add({ name, date, description: desc });
+  clearTournamentForm();
+  loadTournaments();
+}
+
+function clearTournamentForm() {
+  document.getElementById('t_name').value = '';
+  document.getElementById('t_date').value = '';
+  document.getElementById('t_desc').value = '';
+}
+
+/* load tournaments list */
+async function loadTournaments() {
+  const list = document.getElementById('tournamentList');
+  list.innerHTML = '';
+  const items = await db.tournaments.toArray();
+
+  if (!items.length) {
+    list.innerHTML = '<p class="muted">No tournaments yet.</p>';
+    return;
+  }
+
+  items.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  items.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const left = document.createElement('div');
+    left.className = 'left';
+    left.textContent = `${t.name} — ${t.date}`;
+    left.onclick = () => openTournamentView(t.id);
+
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = (ev) => { ev.stopPropagation(); beginEditTournament(t.id); };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.className = 'danger';
+    delBtn.onclick = async (ev) => {
+      ev.stopPropagation();
+      if (confirm(`Delete tournament "${t.name}"?`)) {
+        await db.tournaments.delete(t.id);
+        loadTournaments();
+      }
+    };
+
+    controls.appendChild(editBtn);
+    controls.appendChild(delBtn);
+
+    div.appendChild(left);
+    div.appendChild(controls);
+    list.appendChild(div);
+  });
+}
+
+/* open tournament view */
+let currentTournamentId = null;
+async function openTournamentView(id) {
+  const t = await db.tournaments.get(id);
+  if (!t) return;
+  currentTournamentId = id;
+  document.getElementById('tv_name').textContent = t.name;
+  document.getElementById('tv_date').textContent = t.date;
+  document.getElementById('tv_desc').textContent = t.description || '(No description)';
+  showPage('tournamentView');
+}
+
+/* begin editing tournament (prefill fields) */
+async function beginEditTournament(id) {
+  const t = await db.tournaments.get(id);
+  if (!t) return;
+  currentTournamentId = id;
+  document.getElementById('et_name').value = t.name;
+  document.getElementById('et_date').value = t.date;
+  document.getElementById('et_desc').value = t.description || '';
+  showPage('tournamentEdit');
+}
+
+/* save edits */
+async function saveTournamentEdits() {
+  if (!currentTournamentId) return;
+  const name = document.getElementById('et_name').value.trim();
+  const date = document.getElementById('et_date').value;
+  const desc = document.getElementById('et_desc').value.trim();
+
+  if (!name || !date) {
+    alert("Name and date are required.");
+    return;
+  }
+
+  await db.tournaments.update(currentTournamentId, {
+    name, date, description: desc
+  });
+
+  currentTournamentId = null;
+  loadTournaments();
+  showPage('tournaments');
+}
+
+function cancelEditTournament() {
+  currentTournamentId = null;
+  showPage('tournaments');
+}
+
+/* delete tournament shown in view */
+async function deleteTournamentViewed() {
+  if (!currentTournamentId) return;
+  const t = await db.tournaments.get(currentTournamentId);
+  if (!t) return;
+  if (confirm(`Delete tournament "${t.name}"?`)) {
+    await db.tournaments.delete(currentTournamentId);
+    currentTournamentId = null;
+    loadTournaments();
+    showPage('tournaments');
+  }
+}
+
+/* show edit from view button */
+function showEditTournament() {
+  if (!currentTournamentId) return;
+  beginEditTournament(currentTournamentId);
+}
+
+
+/* -----------------------
+   Player functions
+   ----------------------- */
+async function addPlayer() {
+  const name = document.getElementById('p_name').value.trim();
+  const desc = document.getElementById('p_desc').value.trim();
+  const url = document.getElementById('p_url').value.trim();
+
+  if (!name) {
+    alert("Please provide a player name.");
+    return;
+  }
+
+  await db.players.add({
+    playersName: name,
+    playerDesc: desc,
+    playerURL: url
+  });
+
+  clearPlayerForm();
+  loadPlayers();
+}
+
+function clearPlayerForm() {
+  document.getElementById('p_name').value = '';
+  document.getElementById('p_desc').value = '';
+  document.getElementById('p_url').value = '';
+}
+
+/* load players */
+async function loadPlayers() {
+  const list = document.getElementById('playersList');
+  list.innerHTML = '';
+  const items = await db.players.toArray();
+
+  if (!items.length) {
+    list.innerHTML = '<p class="muted">No players yet.</p>';
+    return;
+  }
+
+  items.sort((a,b) => (a.playersName || '').localeCompare(b.playersName || ''));
+
+  items.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const left = document.createElement('div');
+    left.className = 'left';
+    left.textContent = p.playersName;
+    left.onclick = () => openPlayerView(p.id);
+
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = (ev) => { ev.stopPropagation(); beginEditPlayer(p.id); };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.className = 'danger';
+    delBtn.onclick = async (ev) => {
+      ev.stopPropagation();
+      if (confirm(`Delete player "${p.playersName}"?`)) {
+        await db.players.delete(p.id);
+        loadPlayers();
+      }
+    };
+
+    controls.appendChild(editBtn);
+    controls.appendChild(delBtn);
+
+    div.appendChild(left);
+    div.appendChild(controls);
+    list.appendChild(div);
+  });
+}
+
+/* open player view */
+let currentPlayerId = null;
+async function openPlayerView(id) {
+  const p = await db.players.get(id);
+  if (!p) return;
+  currentPlayerId = id;
+  document.getElementById('pv_name').textContent = p.playersName;
+  document.getElementById('pv_desc').textContent = p.playerDesc || '(No description)';
+  showPage('playerView');
+}
+
+/* open external url from player view */
+async function openPlayerUrl() {
+  if (!currentPlayerId) return;
+  const p = await db.players.get(currentPlayerId);
+  if (!p || !p.playerURL) {
+    alert('No URL set for this player.');
+    return;
+  }
+  // open in new tab
+  window.open(p.playerURL, '_blank');
+}
+
+/* begin edit player */
+async function beginEditPlayer(id) {
+  const p = await db.players.get(id);
+  if (!p) return;
+  currentPlayerId = id;
+  document.getElementById('ep_name').value = p.playersName || '';
+  document.getElementById('ep_desc').value = p.playerDesc || '';
+  document.getElementById('ep_url').value = p.playerURL || '';
+  showPage('playerEdit');
+}
+
+/* save player edits */
+async function savePlayerEdits() {
+  if (!currentPlayerId) return;
+  const name = document.getElementById('ep_name').value.trim();
+  const desc = document.getElementById('ep_desc').value.trim();
+  const url = document.getElementById('ep_url').value.trim();
+
+  if (!name) {
+    alert('Player name required.');
+    return;
+  }
+
+  await db.players.update(currentPlayerId, {
+    playersName: name,
+    playerDesc: desc,
+    playerURL: url
+  });
+
+  currentPlayerId = null;
+  loadPlayers();
+  showPage('players');
+}
+
+function cancelEditPlayer() {
+  currentPlayerId = null;
+  showPage('players');
+}
+
+/* edit button on view page */
+function showEditPlayer() {
+  if (!currentPlayerId) return;
+  beginEditPlayer(currentPlayerId);
+}
+
+/* delete player shown in view */
+async function deletePlayerViewed() {
+  if (!currentPlayerId) return;
+  const p = await db.players.get(currentPlayerId);
+  if (!p) return;
+  if (confirm(`Delete player "${p.playersName}"?`)) {
+    await db.players.delete(currentPlayerId);
+    currentPlayerId = null;
+    loadPlayers();
+    showPage('players');
+  }
+}
+
+/* ---------- Articles (scorecard) ---------- */
+async function addArticle(){
+  const image = document.getElementById('a_image').value.trim();
+  const title = document.getElementById('a_title').value.trim();
+  const desc = document.getElementById('a_desc').value.trim();
+  if (!title){ alert('Title required'); return; }
+  const createdAt = new Date().toISOString();
+  const id = await db.articles.add({ image, title, description: desc, createdAt });
+  clearArticleForm();
+  loadArticles();
+  // open newly created article:
+  openArticleView(id);
+}
+function clearArticleForm(){ document.getElementById('a_image').value=''; document.getElementById('a_title').value=''; document.getElementById('a_desc').value=''; }
+async function loadArticles(){
+  const wrap = document.getElementById('articleList'); wrap.innerHTML='';
+  const items = await db.articles.toArray();
+  if (!items.length){ wrap.innerHTML = '<p class="muted">No articles yet.</p>'; return; }
+  items.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+  items.forEach(a=>{
+    const div = document.createElement('div'); div.className='item';
+    const left = document.createElement('div'); left.className='left'; left.textContent = a.title; left.onclick = ()=> openArticleView(a.id);
+    const controls = document.createElement('div'); controls.className='controls';
+    const del = document.createElement('button'); del.className='danger'; del.textContent='Delete'; del.onclick = async (ev)=>{ ev.stopPropagation(); if(confirm('Delete article?')){ await db.articles.delete(a.id); // also remove scorecards
+        const sc = await db.scorecards.where('articleId').equals(a.id).toArray();
+        for(const s of sc) await db.scorecards.delete(s.id);
+        loadArticles();
+      } };
+    controls.appendChild(del);
+    div.appendChild(left); div.appendChild(controls); wrap.appendChild(div);
+  });
+}
+
+/* ---------- Article View + Scorecard ---------- */
+let currentArticleId = null;
+
+async function openArticleView(articleId){
+  const a = await db.articles.get(articleId);
+  if(!a) return;
+  currentArticleId = articleId;
+  // image
+  const img = document.getElementById('av_image');
+  if (a.image) { img.src = a.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
+  document.getElementById('av_title').textContent = a.title;
+  document.getElementById('av_desc').textContent = a.description || '';
+  showPage('articleView');
+  renderScorecardRows();
+}
+
+/* Render scorecard rows for current article */
+async function renderScorecardRows(){
+  const container = document.getElementById('scoreRows'); container.innerHTML = '';
+  if (!currentArticleId) { container.innerHTML = '<p class="muted">No article selected.</p>'; return; }
+  // load scorecards joined with player name
+  const rows = await db.scorecards.where('articleId').equals(currentArticleId).toArray();
+  if (!rows.length){ container.innerHTML = '<p class="muted">No players on this scorecard yet.</p>'; return; }
+  // for each, fetch player name
+  for(const r of rows){
+    const player = await db.players.get(r.playerId);
+    const playerName = player ? player.playersName : ('[deleted player]');
+    const row = document.createElement('div'); row.className='score-row';
+    const nameEl = document.createElement('div'); nameEl.className='score-name'; nameEl.textContent = playerName;
+    const input = document.createElement('input'); input.type='number'; input.min=1; input.max=10; input.value = r.score || ''; input.className='score-input';
+    input.onchange = async ()=> {
+      let val = parseInt(input.value);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 10) val = 10;
+      input.value = val;
+      await db.scorecards.update(r.id, { score: val });
+    };
+    const removeBtn = document.createElement('button'); removeBtn.textContent='Remove'; removeBtn.className='score-remove';
+    removeBtn.onclick = async ()=> {
+      if (confirm(`Remove ${playerName} from scorecard?`)) {
+        await db.scorecards.delete(r.id);
+        renderScorecardRows();
+      }
+    };
+    row.appendChild(nameEl); row.appendChild(input); row.appendChild(removeBtn);
+    container.appendChild(row);
+  }
+}
+
+/* ---------- Modal: add player to scorecard ---------- */
+function openAddPlayerModal(){
+  if (!currentArticleId){ alert('Open an article first.'); return; }
+  // show modal and list all players, skipping those already in scorecard (prevent duplicates)
+  document.getElementById('playerModal').style.display = 'block';
+  populateModalPlayers();
+}
+function closePlayerModal(e){
+  if (e && e.stopPropagation) e.stopPropagation();
+  document.getElementById('playerModal').style.display = 'none';
+}
+async function populateModalPlayers(){
+  const wrap = document.getElementById('modalPlayers'); wrap.innerHTML = '';
+  const allPlayers = await db.players.toArray();
+  const existing = await db.scorecards.where('articleId').equals(currentArticleId).toArray();
+  const existingIds = new Set(existing.map(r=>r.playerId));
+  if (!allPlayers.length) { wrap.innerHTML = '<p class="muted">No players exist. Create players first.</p>'; return; }
+  allPlayers.sort((a,b)=> (a.playersName||'').localeCompare(b.playersName||''));
+  allPlayers.forEach(p=>{
+    const div = document.createElement('div'); div.className='player-item';
+    const left = document.createElement('div'); left.innerHTML = `<strong>${p.playersName}</strong><div class="small">${p.playerDesc||''}</div>`;
+    const right = document.createElement('div');
+    const btn = document.createElement('button');
+    if (existingIds.has(p.id)) { btn.textContent='Added'; btn.disabled = true; btn.style.opacity=0.6; }
+    else { btn.textContent = 'Add'; btn.onclick = async ()=> { await db.scorecards.add({ articleId: currentArticleId, playerId: p.id, score: null }); populateModalPlayers(); renderScorecardRows(); } }
+    right.appendChild(btn);
+    div.appendChild(left); div.appendChild(right);
+    wrap.appendChild(div);
+  });
+}
+
+/* ---------- Export CSV (simple) ---------- */
+async function exportScorecardCSV(){
+  if (!currentArticleId) return alert('Open an article first.');
+  const rows = await db.scorecards.where('articleId').equals(currentArticleId).toArray();
+  if (!rows.length) return alert('No score entries to export.');
+  // build CSV
+  const lines = [['Player','Score']];
+  for(const r of rows){
+    const p = await db.players.get(r.playerId);
+    lines.push([ p ? p.playersName : '[deleted]', r.score ?? '' ]);
+  }
+  const csv = lines.map(l=> l.map(v=> `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  // download
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `scorecard_${currentArticleId}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- Boot / initial loads ---------- */
+(async function init(){
+  await loadTournaments();
+  await loadPlayers();
+  await loadArticles();
+})();
+
+/*----CALENDAR-----*/
+function generateCalendar(year, month) {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth(); // 0-indexed
+    const currentYear = today.getFullYear();
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+    let html = '<table>';
+    html += '<thead><tr><th colspan="7">' + new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' }) + '</th></tr></thead>';
+    html += '<tbody><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>';
+
+    let dayCounter = 1;
+    for (let i = 0; i < 6; i++) { // Max 6 weeks in a month
+      html += '<tr>';
+      for (let j = 0; j < 7; j++) {
+        if (i === 0 && j < startDayOfWeek) {
+          html += '<td></td>'; // Empty cells before the first day of the month
+        } else if (dayCounter > daysInMonth) {
+          html += '<td></td>'; // Empty cells after the last day of the month
+        } else {
+          let cellClass = '';
+          if (dayCounter === currentDay && month === currentMonth && year === currentYear) {
+            cellClass = 'current-day';
+          }
+          html += '<td class="' + cellClass + '">' + dayCounter + '</td>';
+          dayCounter++;
+        }
+      }
+      html += '</tr>';
+      if (dayCounter > daysInMonth && i >= 4) break; // Stop if all days are rendered
+    }
+    html += '</tbody></table>';
+    return html;
+  }
+
+  const date = new Date();
+  const calendarHTML = generateCalendar(date.getFullYear(), date.getMonth());
+  document.getElementById('calendar-container').innerHTML = calendarHTML;
+  
+  
+  
+  
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function(registration) {
+        console.log('ServiceWorker registered: ', registration);
+      })
+      .catch(function(error) {
+        console.log('ServiceWorker registration failed: ', error);
+      });
+  });
+}
+</script>
+
+<footer></footer>
+</body>
+</html>
