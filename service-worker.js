@@ -1,4 +1,4 @@
-const CACHE_NAME = "studio-cache-v1"; // can stay same
+const CACHE_NAME = "studio-cache-v2"; // can stay same
 const ASSETS = [
   "./",
   "./index.html",
